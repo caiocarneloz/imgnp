@@ -2,61 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io
 
-def normalize_img(img):
-    
-    max_value = np.max(img)
-    new_img = ((img/max_value)*255).astype(int)
-    
-    return new_img
-
-def gray_scale(pixel, i, j, shape):
-    return np.mean(pixel).astype(int)
-
-def x_fade(pixel, i, j, shape):
-    return (pixel * (j/shape[1])).astype(int)
-
-def y_fade(pixel, i, j, shape):
-    return (pixel * (i/shape[0])).astype(int)
-
-def process_img_pixels(img, func):
-    
-    new_img = np.zeros(shape=img.shape, dtype = int)
-   
-    for i in range(img.shape[0]):
-        for j in range(img.shape[1]):
-            
-            new_img[i, j, :] = func(img[i, j, :], i, j, img.shape)
-            
-    return new_img
-
-def img_sum(pixel1, pixel2):
-    return pixel1 + pixel2
-
-def img_sub(pixel1, pixel2):
-    return pixel1 - pixel2
-
-def img_div(pixel1, pixel2):
-    return pixel1 / pixel2
-
-def img_mul(pixel1, pixel2):
-    return pixel1 * pixel2
-
-def process_img_operations(img1, img2, func):
-    
-    if img1.shape != img2.shape:
-        print('images must have same shape')
-        return None
-    
-    new_img = np.zeros(shape=img.shape, dtype = int)
-   
-    for i in range(img1.shape[0]):
-        for j in range(img1.shape[1]):
-            
-            new_img[i, j, :] = func(img1[i, j, :], img2[i, j, :])                
-
-    return new_img
-
-
 def get_transf_matrix(transf_type, scalar1=0, scalar2=0):
     
     if transf_type == 'rotate':
@@ -71,6 +16,64 @@ def get_transf_matrix(transf_type, scalar1=0, scalar2=0):
         return np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
     
     return False
+
+def get_pixel_operation(op, pixel, i, j, shape):
+    
+    if op == 'gray':
+        return np.mean(pixel).astype(int)
+    if op == 'xfade':
+        return (pixel * (j/shape[1])).astype(int)
+    if op == 'yfade':
+        return (pixel * (i/shape[0])).astype(int)    
+
+def get_arithmetic_operation(op, pixel1, pixel2):
+    
+    if op == 'sum':
+        return pixel1 + pixel2
+    if op == 'sub':
+        return pixel1 - pixel2
+    if op == 'div':
+        return pixel1 / pixel2
+    if op == 'mul':
+        return pixel1 * pixel2
+
+def normalize_img(img):
+    
+    min_value = np.min(img)
+    img += min_value
+    max_value = np.max(img)
+    
+    new_img = ((img/max_value)*255).astype(int)
+    
+    return new_img
+
+def process_img_operations(img1, img2, op):
+    
+    if img1.shape != img2.shape:
+        print('images must have same shape')
+        return None
+    
+    new_img = np.zeros(shape=img.shape, dtype = int)
+   
+    for i in range(img1.shape[0]):
+        for j in range(img1.shape[1]):
+            
+            new_img[i, j, :] = get_arithmetic_operation(op, img1[i, j, :], img2[i, j, :])                
+
+    return new_img
+
+
+def process_img_pixels(img, op):
+    
+    new_img = np.zeros(shape=img.shape, dtype = int)
+   
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            
+            new_img[i, j, :] = get_pixel_operation(op, img[i, j, :], i, j, img.shape)
+            
+    return new_img
+
 
 def process_img_transformations(img, transf):
     
@@ -91,28 +94,29 @@ def process_img_transformations(img, transf):
     
     return new_img
 
+
 filename = 'taças.jpg'
 img = io.imread(filename)
 
-gray_img = process_img_pixels(img, gray_scale)
+gray_img = process_img_pixels(img, 'gray')
 plt.imshow(gray_img)
 
-x_img = process_img_pixels(gray_img, x_fade)
+x_img = process_img_pixels(gray_img, 'xfade')
 plt.imshow(x_img)
 
-sum_img = process_img_operations(x_img, gray_img, img_sum)
+sum_img = process_img_operations(x_img, gray_img, 'sum')
 sum_img = normalize_img(sum_img)
 plt.imshow(sum_img)
 
-y_img = process_img_pixels(gray_img, y_fade)
+y_img = process_img_pixels(gray_img, 'yfade')
 plt.imshow(y_img)
 
-sum_img = process_img_operations(y_img, gray_img, img_sum)
+sum_img = process_img_operations(y_img, gray_img, 'sum')
 sum_img = normalize_img(sum_img)
 plt.imshow(sum_img)
 
 
-sum_img = process_img_operations(x_img, y_img, img_sum)
+sum_img = process_img_operations(x_img, y_img, 'sum')
 sum_img = normalize_img(sum_img)
 plt.imshow(sum_img)
 
