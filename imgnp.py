@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io
 
+#GET MATRICES THAT TRANSFORMS THE SPACE
 def get_transf_matrix(transf_type, scalar1=0, scalar2=0):
     
     if transf_type == 'rotate':
@@ -17,6 +18,7 @@ def get_transf_matrix(transf_type, scalar1=0, scalar2=0):
     
     return False
 
+#DO COLOR/INTENSITY OPERATION WITH PIXELS
 def get_pixel_operation(op, pixel, i, j, shape):
     
     if op == 'gray':
@@ -26,6 +28,7 @@ def get_pixel_operation(op, pixel, i, j, shape):
     if op == 'yfade':
         return (pixel * (i/shape[0])).astype(int)    
 
+#DO ARITHMETIC OPERATIONS WITH PIXELS
 def get_arithmetic_operation(op, pixel1, pixel2):
     
     if op == 'sum':
@@ -37,6 +40,7 @@ def get_arithmetic_operation(op, pixel1, pixel2):
     if op == 'mul':
         return pixel1 * pixel2
 
+#NORMALIZE A GIVEN IMAGE TO HAVE [0, 255] RANGE
 def normalize_img(img):
     
     min_value = np.min(img)
@@ -47,6 +51,7 @@ def normalize_img(img):
     
     return new_img
 
+#ITERATE THROUGH IMAGE TO DO ARITHMETIC OPERATIONS BETWEEN TWO IMAGES
 def process_img_operations(img1, img2, op):
     
     if img1.shape != img2.shape:
@@ -62,7 +67,7 @@ def process_img_operations(img1, img2, op):
 
     return new_img
 
-
+#ITERATE THROUGH IMAGE TO DO PIXEL OPERATIONS
 def process_img_pixels(img, op):
     
     new_img = np.zeros(shape=img.shape, dtype = int)
@@ -74,7 +79,7 @@ def process_img_pixels(img, op):
             
     return new_img
 
-
+#ITERATE THROUGH IMAGE TO TRANSFORM IMAGES BASED ON TRANSFORMATION MATRICES
 def process_img_transformations(img, transf):
     
     new_img = np.zeros(shape=img.shape, dtype = int)
@@ -94,33 +99,38 @@ def process_img_transformations(img, transf):
     
     return new_img
 
-
+#READ IMAGE
 filename = 'taças.jpg'
 img = io.imread(filename)
 
+#CONVERT TO GRAY SCALE
 gray_img = process_img_pixels(img, 'gray')
 plt.imshow(gray_img)
 
+#FADE BASED ON X POS
 x_img = process_img_pixels(gray_img, 'xfade')
 plt.imshow(x_img)
 
+#SUM GRAYSCALE WITH X FADED
 sum_img = process_img_operations(x_img, gray_img, 'sum')
 sum_img = normalize_img(sum_img)
 plt.imshow(sum_img)
 
+#FADE BASED ON Y POS
 y_img = process_img_pixels(gray_img, 'yfade')
 plt.imshow(y_img)
 
+#SUM GRAYSCALE WITH Y FADED
 sum_img = process_img_operations(y_img, gray_img, 'sum')
 sum_img = normalize_img(sum_img)
 plt.imshow(sum_img)
 
-
+#SUM GRAYSCALE WITH Y FADED AND X FADED
 sum_img = process_img_operations(x_img, y_img, 'sum')
 sum_img = normalize_img(sum_img)
 plt.imshow(sum_img)
 
-
+#AFFINE MATRIX TO ROTATE IMAGE IN THE CENTER
 transf = [['translate', img.shape[0]/2, img.shape[1]/2],
           ['rotate', 0.2, 0],
           ['translate', -img.shape[0]/2, -img.shape[1]/2]]
