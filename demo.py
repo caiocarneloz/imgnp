@@ -71,3 +71,7 @@ plt.imshow(bin_img)
 #SQUARE AND LOG IMAGES WITH 128 THRESHOLD
 nol_img = process_img_by_range(gray_img, ['square','log'], [0,128,256], 1)
 plt.imshow(nol_img)
+
+
+his_img = histogram_equalizer(gray_img, 256)
+plt.imshow(his_img)

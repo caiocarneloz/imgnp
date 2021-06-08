@@ -1,6 +1,25 @@
+
 import numpy as np
 import img_utils as imgutils
 from bisect import bisect
+
+#EQUALIZES HISTOGRAM USING PROBABILITY DENSITY
+def histogram_equalizer(img, gray_levels):
+    
+    new_img = np.zeros(shape=img.shape, dtype = int)
+
+    prob_dict = dict.fromkeys(np.arange(gray_levels), 0)
+    keys, counts = np.unique(img[:,:,0], return_counts=True)
+
+    counts = np.cumsum(counts)
+
+    for key, value in zip(keys, counts):
+        prob_dict[key] = np.round((value/img[:,:,0].size)*(gray_levels-1)).astype(int)
+
+    for key in prob_dict.keys():
+        new_img[img == key] = prob_dict[key]
+
+    return new_img
 
 #ITERATE THROUGH IMAGE TO DO PIXEL OPERATIONS
 def process_img_by_range(img, ops, bins, scale=None):
