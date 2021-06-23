@@ -44,6 +44,10 @@ plt.imshow(new_img)
 
 
 ##EX2
+#BINARIZE IMAGES WITH 128 THRESHOLD 
+bin_img = process_img_by_range(gray_img, ['min','max'], [0,128,256])
+plt.imshow(bin_img)
+
 #APPLY NON-LINEAR FUNC EXP
 exp_img = process_img_pixels(gray_img, 'exp', 1)
 exp_img = imgutils.normalize_img(exp_img)
@@ -64,14 +68,10 @@ log_img = process_img_pixels(gray_img, 'log', 1)
 log_img = imgutils.normalize_img(log_img)
 plt.imshow(log_img)
 
-#BINARIZE IMAGES WITH 128 THRESHOLD 
-bin_img = process_img_by_range(gray_img, ['min','max'], [0,128,256])
-plt.imshow(bin_img)
-
 #SQUARE AND LOG IMAGES WITH 128 THRESHOLD
-nol_img = process_img_by_range(gray_img, ['square','log'], [0,128,256], 1)
+nol_img = process_img_by_range(gray_img, ['exp','log'], [0,128,256], 1)
 plt.imshow(nol_img)
 
-
+#EQUALIZE HISTOGRAM
 his_img = histogram_equalizer(gray_img, 256)
 plt.imshow(his_img)
